@@ -35,7 +35,7 @@ def _get_all_tags(cred:dict) -> dict:
     """
     Retrieves all available tags from the API
 
-    :param cred: API Credentials
+    :param cred: Credential dictionary {'instance': <url>, 'api_key': <key>}
     :return: dictionary {name: UUID}
     """
     API_KEY = cred['api_key']
@@ -53,7 +53,8 @@ def _get_all_tags(cred:dict) -> dict:
         keyvalue[tag_dict['name']] = tag_dict['id']
     return keyvalue
 
-def _filter_tags_by_regex(regex:str, tags: dict):
+
+def _filter_tags_by_regex(regex: str, tags: dict):
     """
     Filters the given dictionary with the provided regex
     and gives back all those hits and discards the rest
@@ -68,9 +69,12 @@ def _filter_tags_by_regex(regex:str, tags: dict):
             hits[key] = value
     return hits
 
+
 def _get_assoc_assets(cred: dict, tag_id: str, page:int=1, recursive_list:list = []) -> list | bool:
     """
     Retrieves the asset IDs for one tag for later use (in this context mostly for rollback
+
+    :param cred:  Credential dictionary {'instance': <url>, 'api_key': <key>}
     :param tag_id: UUID of the tag that is searched of
     :param page: results might be paginated, with more than 250 hits per page
     :param recursive_list: transfer list for the recursive use of this
@@ -110,12 +114,13 @@ def _get_assoc_assets(cred: dict, tag_id: str, page:int=1, recursive_list:list =
         print(data)
         return False
 
+
 def _actually_delete_tags(creds: dict, tag_ids: dict) -> bool:
     """
     Deletes all provided tags
 
-    :param creds: Credentials for the API (Instance url & API key)
-    :param tag_ids:
+    :param creds:  Credential dictionary {'instance': <url>, 'api_key': <key>}
+    :param tag_ids: ids of the tags to be deleted in a dictionary {'<name>': '<UUID>'
     :return: If _everything_ worked True, if there were errors, False
     """
     countdown = len(tag_ids.items())
@@ -136,7 +141,7 @@ def _actually_delete_tags(creds: dict, tag_ids: dict) -> bool:
             print(f"\t{key} - {value['message']}")
         return False
 
-def _delete_one_tag_from_assets(creds:dict, tag_id: str, asset_ids: list):
+def _delete_one_tag_from_assets(creds:dict, tag_id: str, asset_ids: list) -> requests.Response:
     """
     EDIT: Nevermind, this is not the case, IMMICH actually works the way I thought it would
 
@@ -146,9 +151,9 @@ def _delete_one_tag_from_assets(creds:dict, tag_id: str, asset_ids: list):
     bothering me about details. On other hand, I am glad that I got this level
     of control
 
-    :param creds:
-    :param tag_id:
-    :param asset_id:
+    :param creds:  Credential dictionary {'instance': <url>, 'api_key': <key>}
+    :param tag_id: UUID of a singular tag
+    :param asset_ids: List of all the assets that contain it
     :return:
     """
     API_KEY = creds['api_key']
@@ -163,16 +168,16 @@ def _delete_one_tag_from_assets(creds:dict, tag_id: str, asset_ids: list):
         "ids": asset_ids
     })
     print(f"Deleting TAG [{tag_id}] from Assets [{", ".join(asset_ids)}]")
-    resp = requests.request("DELETE", url, headers=headers, data=payload)
-    print(resp.text)
+    return requests.request("DELETE", url, headers=headers, data=payload)
     #400 BAD REQUEST
     #404 NOT FOUND
+
 
 def _delete_one_tag(creds: dict, tag_id: str):
     """
     Apparently one has to delete all instances of the used tag first. Pain.
-    :param creds:
-    :param tag_id:
+    :param creds: Credential dictionary {'instance': <url>, 'api_key': <key>}
+    :param tag_id: <UUID> of an Immich tag
     :return:
     """
     API_KEY = creds['api_key']
@@ -190,12 +195,13 @@ def _delete_one_tag(creds: dict, tag_id: str):
     else:
         return json.loads(resp.text)
 
-def tag_delete_by_regex(creds: dict, default_regex:str="") -> bool:
+
+def tag_delete_by_regex(creds: dict, default_regex: str = '') -> bool:
     """
     Console input routine for deleting a number of tags that match
     a regex
 
-    :param creds: Credentials for the Immich API
+    :param creds: Credential dictionary {'instance': <url>, 'api_key': <key>}
     :param default_regex: pre filled regex for recursion purpose
     :return: If everything was successfully, True
     """
@@ -213,7 +219,7 @@ def tag_delete_by_regex(creds: dict, default_regex:str="") -> bool:
     number_of_tags = len(filtered_tags)
     if number_of_tags <= 0:
         print(f"Error: {cg.color("Not a single hit, you might want to try again", "pure_red")}")
-        input("Press the ANY key to continue")
+        input("Press the ENTER key to continue")
         return tag_delete_by_regex(creds, my_regex)
     if number_of_tags  > LINE_TRESHHOLD:
         ###
@@ -239,7 +245,7 @@ def tag_delete_by_regex(creds: dict, default_regex:str="") -> bool:
     ###
     ### DECISION: DELETE OR EDIT
     ###
-    input("Press the ANY key to continue")
+    input("Press the ENTER key to continue")
     print(f"\x1b[2J\033[H{cg.color("Temporary Immich Help Scripts","bright_purple")}")
     print(cg.color("Are those hits to your liking?", "bold"))
     print(cg.color("1 - Delete selected tags", "pure_red"))

@@ -81,7 +81,8 @@ def color(text:str, color: Literal['pure_red','dark_green','orange','dark_blue',
     else:
         return text
 
-def strike(text:str) -> str:
+
+def strike(text : str) -> str:
     """
     Uses some random stuff I found on StackOverload to make strike through characters.
     No clue how far it works
@@ -93,5 +94,7 @@ def strike(text:str) -> str:
         result = result + c + '\u0336'
     return result
 
+
 if __name__ == "__main__":
     print("This file is part of TemporarImmichHelp, but does nothing in itself. Run main.py")
+

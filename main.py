@@ -24,19 +24,22 @@ import console_garnish as cg
 import json
 
 from tag_delete_by_regex import tag_delete_by_regex
+from retime_whatsapp_pictures import retime_whatsapp_pictures
 from reused_tools import recursive_number_input
+
 
 def save_credentials_to_json(creds: dict) -> bool:
     """
     Saves credits into hard coded file in run time folder. Holy boilderplate batman.
-    :param creds: credentials in std format { "api_key": <>, "instance": <>}
+    :param creds: Credential dictionary {'instance': <url>, 'api_key': <key>}
     :return: Always True, always. Catch some exceptions here Alan
     """
     with open('api_key.json', 'w') as api_json:
         json.dump(creds, api_json, indent=4)
     return True
 
-def retrieve_api_key(test_only=False, skip_file=False) -> bool | dict:
+
+def retrieve_api_key(test_only = False, skip_file = False) -> bool | dict:
     """
     Helper function to get the API key either from a json or by manual input
 
@@ -62,7 +65,13 @@ def retrieve_api_key(test_only=False, skip_file=False) -> bool | dict:
             return False
         return manual_api_input()
 
-def manual_api_input():
+
+def manual_api_input() -> dict:
+    """
+    Small helper function for facilitate the input of two values without bloating
+    the main script
+    :return: Credential dictionary {'instance': <url>, 'api_key': <key>}
+    """
     print("[Instance] Copy & Paste (or enter) the path to the Instance API Endpoint")
     print(cg.color("Usually its https://<instances/api/", "grey"))
     instance = input("Instance: ")
@@ -70,7 +79,16 @@ def manual_api_input():
     api_key = input("API Key: ")
     return {'api_key': api_key, 'instance': instance}
 
+
 def check_api_key_rights(cred: dict, *permissions) -> list | bool | None:
+    """
+    Checks if the provided credentials have all the permissions
+    that are asked for
+
+    :param cred: Credential dictionary {'instance': <url>, 'api_key': <key>}
+    :param permissions: list of Immich api permissions like 'asset.read'
+    :return: False if the endpoint doesnt work at all, True if all fine and a list of missing permissions of any
+    """
     API_KEY = cred['api_key']
     INSTANCE = cred['instance']
     url = INSTANCE + "api-keys/me"
@@ -99,7 +117,8 @@ def check_api_key_rights(cred: dict, *permissions) -> list | bool | None:
         return missing_perm
     return True # this is stupid, but if its None its good because nothing is missing
 
-def recursive_api_key_retrieval(skip_file:bool=False) -> dict | bool:
+
+def recursive_api_key_retrieval(skip_file : bool = False) -> dict | bool:
     """
     Another recursive function that loops itself if something is amiss.
 
@@ -142,7 +161,7 @@ def recursive_api_key_retrieval(skip_file:bool=False) -> dict | bool:
 
 PROCESSES = {
     1: {'name': "Delete Tags by Regex", 'active': True},
-    2: {'name': "ReTime Whatsapp Pictures", 'active': False},
+    2: {'name': "ReTime Whatsapp Pictures", 'active': True},
     3: {'name': "Rollback Tag Deletion", 'active': False}
 }
 
@@ -166,21 +185,28 @@ if __name__ == "__main__":
             print(cg.strike(f"{i} {each['name']}"))
     print("\n0 - Exit")
     print(cg.color("Choose process by Number", "dull_white"))
-    number = recursive_number_input(0, 1)
+    number = recursive_number_input(0, 2)
     if number == 0:
         exit(0)
 
-    # and at this point it is not parametric anymore because the processes are all so different, anyway, for now
-    # there is only one anyway
+    if number == 1:
+        print(f"Congratulations, your chosen process is {cg.color(PROCESSES[number]['name'], "bold")}")
 
-    print(f"Congratulations, your chosen process is {cg.color(PROCESSES[number]['name'], "bold")}")
+        print("Checking if the provided API key got the correct permissions.")
+        needed_perm = ["asset.read", "tag.read", "tag.delete"]  # search for affected assets, find all tags, delete selected tags
+        if missing := check_api_key_rights(creds, *needed_perm):
+            if isinstance(missing, list):
+                print(f"Permissions are missing: {", ".join(missing)}")
+                print("Aborting, see ya next time")
+                input("Press the ENTER key to exit()")
+        tag_delete_by_regex(creds)
 
-    print("Checking if the provided API key got the correct permissions.")  # actually I would need to this after I choose a process
-    needed_perm = ["asset.read", "tag.read", "tag.delete"]  # search for affected assets, find all tags, delete selected tags
-    if missing := check_api_key_rights(creds, *needed_perm):
-        if isinstance(missing, list):
-            print(f"Permissions are missing: {", ".join(missing)}")
-            print("Aborting, see ya next time")
-            input("Press the ANY key to exit()")
-    tag_delete_by_regex(creds)
-
+    if number == 2:
+        print("Checking if the provided API key got the correct permissions.")
+        needed_perm = ["album.read", "asset.update"]
+        if missing := check_api_key_rights(creds, *needed_perm):
+            if isinstance(missing, list):
+                print(f"Permissions are missing: {", ".join(missing)}")
+                print("Aborting, see ya next time")
+                input("Press the ENTER key to exit()")
+        retime_whatsapp_pictures(creds)

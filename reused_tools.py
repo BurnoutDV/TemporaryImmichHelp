@@ -23,22 +23,24 @@ import re
 import readline
 import sys
 
-def recursive_input_regex(prompt:str="", default_regex:str="") -> str:
+
+def recursive_input_regex(prompt: str = "", default_regex: str = "") -> str:
     """
     Recursive annoying input for a str that is supposed to be proper regex..will keep nagging you until
     it is done
 
-    :param prompt:
+    :param prompt: the default input prompt
     :param default_regex: prefilled text
     :return:
     """
-    text= input_with_prefill(prompt, default_regex)
+    text = input_with_prefill(prompt, default_regex)
     try:
         re.compile(text)
         return text
     except re.error:
         print("Regex seems to be malformed, try again:")
         return recursive_input_regex(prompt, default_regex)
+
 
 def recursive_number_input(min_value: int, max_value: int) -> int:
     """
@@ -58,6 +60,7 @@ def recursive_number_input(min_value: int, max_value: int) -> int:
         return recursive_number_input(min_value, max_value)
     return number
 
+
 def input_with_prefill(prompt: str, text: str) -> str:
     """
     A slightly modified input field that allows to prewrite the input text
@@ -75,11 +78,11 @@ def input_with_prefill(prompt: str, text: str) -> str:
 
 def simple_progress_bar(current: float,
                         maxi: float,
-                        pre:str= "",
-                        suf:str= "",
+                        pre: str= "",
+                        suf: str= "",
                         out=sys.stdout,
-                        clear:bool=False,
-                        clear_chr:chr=" ") -> bool | None:
+                        clear: bool=False,
+                        clear_chr: chr=" ") -> bool | None:
     """
         Simple Progress Bar, any other print called between will break it
 
@@ -121,6 +124,7 @@ def simple_progress_bar(current: float,
     the_bar = "="*extra_length + arrow + " "*(extra_space-extra_length)
     print(pre + "|" + the_bar + "|" + suf, file=out, end="\r")
     return True
+
 
 if __name__ == "__main__":
     print("This file is part of TemporarImmichHelp, but does nothing in itself. Run main.py")

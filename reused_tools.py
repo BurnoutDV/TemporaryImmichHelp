@@ -45,8 +45,8 @@ def recursive_input_regex(prompt: str = "", default_regex: str = "") -> str:
 def recursive_number_input(min_value: int, max_value: int) -> int:
     """
     Repeats the input of a number till its actually a number and within the limits assigned
-    :param min_value:
-    :param max_value:
+    :param min_value: minimum number that is allowed, its an inclusive minima
+    :param max_value: maximum number that is allowed, its an inclusive maxima
     :return:
     """
     written = input("Selection: ")
@@ -60,6 +60,36 @@ def recursive_number_input(min_value: int, max_value: int) -> int:
         return recursive_number_input(min_value, max_value)
     return number
 
+def recursive_minimum_str_input(prompt: str = "", min_length: int = 3) -> str:
+    """
+    Simple console helper function to make sure that a string contains some text
+
+    :param prompt: the default input prompt
+    :param min_length: minimum number of characters
+    :return:
+    """
+    written = input(prompt)
+    if len(written) < min_length:
+        print(f"The input string has to be at least {min_length} characters long. Retrying.")
+        return recursive_minimum_str_input(prompt, min_length)
+    return written
+
+
+def sizeof_fmt(num: int, suffix="B") -> str:
+    """
+    Human readeable size
+
+    https://stackoverflow.com/a/1094933
+
+    https://web.archive.org/web/20111010015624/http://blogmag.net/blog/read/38/Print_human_readable_file_size
+    :param int num: size in bytes
+    :param str suffix: suffix after size identifier, like GiB
+    """
+    for unit in ["", "Ki", "Mi", "Gi", "Ti", "Pi", "Ei", "Zi"]:
+        if abs(num) < 1024.0:
+            return f"{num:3.1f} {unit}{suffix}"
+        num /= 1024.0
+    return f"{num:.1f} Yi{suffix}"
 
 def input_with_prefill(prompt: str, text: str) -> str:
     """

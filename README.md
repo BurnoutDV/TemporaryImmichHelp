@@ -16,6 +16,11 @@ Needs API Key with Permissions: `album.read`, `asset.update`
 
 For reasons only known to past me I transport my whole WhatsApp Picture folder and everything from one Smartphone to another. At some point, in my case, April 2022 all pictures from before that lost their file date and now the files are cluttered and one specific day. This is annoying. The good news is, the files itself got the correct date in their name so its a solveable problem and I can enrich them with meta data.
 
+### Putting all Videos of an Album in a new Album
+
+The scenario here is that i foolishly activated auto update on my 128 gig `Camera` Folder on my phone. There are only around 20 gig of Pictures from the last 15 Years (I actually importet older digi cam pictures), so just the normal stuff I like to have locally available when speaking with people for visual refrence. There are also Videos. Videos I have backed up elsewhere, Videos that I look at upon occassion but that have no place in my Immich instance. Luckily, the automatic app upload puts everything into seperate albums. Its actually quite intelligent about it, it doesnt uploads duplicated but puts those into the album aswell. But, one cannot filter for albums, or filter an album for videos only. So here I am, writing another stupid script.
+
+
 ---
 ## Not yet implemented
 

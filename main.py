@@ -25,6 +25,7 @@ import json
 
 from tag_delete_by_regex import tag_delete_by_regex
 from retime_whatsapp_pictures import retime_whatsapp_pictures
+from video_seperation import  video_seperation
 from reused_tools import recursive_number_input
 
 
@@ -162,7 +163,8 @@ def recursive_api_key_retrieval(skip_file : bool = False) -> dict | bool:
 PROCESSES = {
     1: {'name': "Delete Tags by Regex", 'active': True},
     2: {'name': "ReTime Whatsapp Pictures", 'active': True},
-    3: {'name': "Rollback Tag Deletion", 'active': False}
+    3: {'name': "Rollback Tag Deletion", 'active': False},
+    4: {'name': "Put all Videos of an Album in a new Album", 'active': True}
 }
 
 if __name__ == "__main__":
@@ -185,13 +187,12 @@ if __name__ == "__main__":
             print(cg.strike(f"{i} {each['name']}"))
     print("\n0 - Exit")
     print(cg.color("Choose process by Number", "dull_white"))
-    number = recursive_number_input(0, 2)
+    number = recursive_number_input(0, 4)
     if number == 0:
         exit(0)
-
+    print(f"Congratulations, your chosen process is {cg.color(PROCESSES[number]['name'], "bold")}")
+    # when the permissions are in order..you never see this because it gets overwritten by the next part of the script
     if number == 1:
-        print(f"Congratulations, your chosen process is {cg.color(PROCESSES[number]['name'], "bold")}")
-
         print("Checking if the provided API key got the correct permissions.")
         needed_perm = ["asset.read", "tag.read", "tag.delete"]  # search for affected assets, find all tags, delete selected tags
         if missing := check_api_key_rights(creds, *needed_perm):
@@ -210,3 +211,13 @@ if __name__ == "__main__":
                 print("Aborting, see ya next time")
                 input("Press the ENTER key to exit()")
         retime_whatsapp_pictures(creds)
+
+    if number == 4:
+        print("Checking if the provided API key got the correct permissions.")
+        needed_perm = ["album.read", "album.create"]
+        if missing := check_api_key_rights(creds, *needed_perm):
+            if isinstance(missing, list):
+                print(f"Permissions are missing: {", ".join(missing)}")
+                print("Aborting, see ya next time")
+                input("Press the ENTER key to exit()")
+        video_seperation(creds)

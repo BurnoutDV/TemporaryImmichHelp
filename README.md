@@ -2,6 +2,8 @@
 
 With every day Immich gets more powerful and gains new utility, for now not everything is easily possible with the supplied tools. At one point my work here might be pointless, but for now this repository contains some quick scripts that help me facilitate more complex functions at the drop of a hat
 
+![Images of the console output of the start page of this project](Interface.png)
+
 ## Features
 
 ### Deleting tags by Regex
